@@ -2,13 +2,14 @@
 //  HomeView.swift
 //  Tiktok Clone
 //
-//  Created by Ryandra Anditto on 30/04/26.
+//  Created on 30/04/26.
 //
 
 import SwiftUI
 
 struct HomeView: View {
     @State private var selectedTab: String = "For You"
+    @State private var showModal = false
     
     struct PostAction: Identifiable {
         let id = UUID()
@@ -16,7 +17,7 @@ struct HomeView: View {
         let label: String
         var isLiked: Bool? = nil
     }
-
+    
     @State private var actions: [PostAction] = [
         PostAction(icon: "heart.fill", label: "1.2k", isLiked: false),
         PostAction(icon: "bubble.fill", label: "1.2k"),
@@ -27,9 +28,12 @@ struct HomeView: View {
     func actionButton(action: PostAction) -> some View {
         VStack {
             Button {
-                if let index = actions.firstIndex(where: { $0.id == action.id }),
-                   actions[index].isLiked != nil {
-                    actions[index].isLiked?.toggle()
+                if let index = actions.firstIndex(where: { $0.id == action.id }) {
+                    if actions[index].isLiked != nil {
+                        actions[index].isLiked?.toggle()
+                    } else if action.icon == "bubble.fill" {
+                        showModal = true
+                    }
                 }
             } label: {
                 Image(systemName: action.icon)
@@ -45,120 +49,128 @@ struct HomeView: View {
     
     var body: some View {
         GeometryReader { geometry in
-        ZStack {
-            // video player
-            Image("post")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 0)
-                .ignoresSafeArea()
-            
-            VStack {
-                // Navigation bar
-                HStack {
-                    Image(systemName: "livephoto")
-                        .font(.system(size: 28))
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 24) {
-                        ForEach(["Following", "For You"], id: \.self) { tab in
-                            VStack(spacing: 4) {
-                                Text(tab)
-                                    .fontWeight(selectedTab == tab ? .semibold : .regular)
-                                
-                                Rectangle()
-                                    .frame(width: 24, height: 2)
-                                    .opacity(selectedTab == tab ? 1 : 0)
-                            }
-                            .onTapGesture {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    selectedTab = tab
+            ZStack {
+                // video player
+                Image("post")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 0)
+                    .ignoresSafeArea()
+                
+                VStack {
+                    // Navigation bar
+                    HStack {
+                        Image(systemName: "livephoto")
+                            .font(.system(size: 28))
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 24) {
+                            ForEach(["Following", "For You"], id: \.self) { tab in
+                                VStack(spacing: 4) {
+                                    Text(tab)
+                                        .fontWeight(selectedTab == tab ? .semibold : .regular)
+                                    
+                                    Rectangle()
+                                        .frame(width: 24, height: 2)
+                                        .opacity(selectedTab == tab ? 1 : 0)
+                                }
+                                .onTapGesture {
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedTab = tab
+                                    }
                                 }
                             }
                         }
+                        
+                        Spacer()
+                        
+                        Image(systemName: "magnifyingglass")
+                            .font(.system(size: 28))
                     }
+                    .padding()
+                    .foregroundColor(.white)
                     
                     Spacer()
                     
-                    Image(systemName: "magnifyingglass")
-                        .font(.system(size: 28))
-                }
-                .padding()
-                .foregroundColor(.white)
-                
-                Spacer()
-                
-                // User action area
-                HStack {
-                    // Info post
-                    VStack(alignment: .leading) {
-                        Spacer()
-                        
-                        Text("Casey")
+                    // User action area
+                    HStack {
+                        // Info post
+                        VStack(alignment: .leading) {
+                            Spacer()
+                            
+                            Text("Casey")
+                                .fontWeight(.semibold)
+                            
+                            Spacer().frame(height: 16)
+                            
+                            Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book")
+                                .lineLimit(2)
+                                .truncationMode(.tail)
+                            
+                            Spacer().frame(height: 16)
+                            
+                            HStack {
+                                Image(systemName: "music.note")
+                                Text("Akon - Lonely")
+                            }
                             .fontWeight(.semibold)
-                        
-                        Spacer().frame(height: 16)
-                        
-                        Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book")
-                            .lineLimit(2)
-                            .truncationMode(.tail)
-                        
-                        Spacer().frame(height: 16)
-                        
-                        HStack {
-                            Image(systemName: "music.note")
-                            Text("Akon - Lonely")
                         }
-                        .fontWeight(.semibold)
-                    }
-                    .foregroundStyle(.white)
-                    
-                    Spacer().frame(width: 56)
-                    
-                    // Response
-                    VStack {
-                        Spacer()
+                        .foregroundStyle(.white)
                         
-                        ZStack(alignment: .bottom) {
+                        Spacer().frame(width: 56)
+                        
+                        // Response
+                        VStack {
+                            Spacer()
+                            
+                            ZStack(alignment: .bottom) {
+                                Image("photo-profile")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 56, height: 56)
+                                    .clipShape(Circle())
+                                
+                                Button{
+                                    
+                                } label: {
+                                    Circle()
+                                        .fill(.red)
+                                        .frame(width: 24, height: 24)
+                                        .overlay {
+                                            Image(systemName: "plus")
+                                        }
+                                        .foregroundStyle(Color.white)
+                                        .offset(y: 10)
+                                }
+                            }
+                            
+                            Spacer().frame(height: 32)
+                            
+                            ForEach(actions) { action in
+                                actionButton(action: action)
+                            }
+                            
                             Image("photo-profile")
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 56, height: 56)
+                                .frame(width: 48, height: 48)
                                 .clipShape(Circle())
                             
-                            Button{
-                                
-                            } label: {
-                                Circle()
-                                    .fill(.red)
-                                    .frame(width: 24, height: 24)
-                                    .overlay {
-                                        Image(systemName: "plus")
-                                    }
-                                    .foregroundStyle(Color.white)
-                                    .offset(y: 10)
-                            }
                         }
-                        
-                        Spacer().frame(height: 32)
-                        
-                        ForEach(actions) { action in
-                            actionButton(action: action)
-                        }
-                        
-                        Image("photo-profile")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 48, height: 48)
-                            .clipShape(Circle())
-                        
                     }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, geometry.safeAreaInsets.bottom + 32)
                 }
-                .padding(.horizontal, 8)
-                .padding(.bottom, geometry.safeAreaInsets.bottom + 32)
             }
         }
+        .sheet(isPresented: $showModal) {
+            Text("No Comment")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .presentationDetents([.medium])
+                .presentationCornerRadius(16)
+                .presentationBackground(.white)
+                .ignoresSafeArea()
         }
     }
 }
