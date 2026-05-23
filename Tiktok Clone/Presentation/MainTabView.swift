@@ -1,12 +1,19 @@
 //
-//  MainView.swift
+//  MainTabView.swift
 //  Tiktok Clone
 //
 
 import SwiftUI
 
-struct MainView: View {
+struct MainTabView: View {
     @State private var selectedTab = 0
+    @EnvironmentObject var appState: AppState
+
+    private let commentViewModel = CommentViewModel(
+        getCommentsUseCase: GetCommentsUseCase(
+            repository: CommentRepository()
+        )
+    )
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -57,9 +64,29 @@ struct MainView: View {
                 tabBarItem(icon: "person.fill", label: "Profile", index: 4)
             }
             .padding(.top, 12)
-            //.padding(.bottom, 28)
             .background(.black)
         }
+        // Background overlay — fade
+        .overlay {
+            if appState.showCommentModal {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            appState.showCommentModal = false
+                        }
+                    }
+                    .transition(.opacity)
+            }
+        }
+        // Modal sheet — slide dari bawah
+        .overlay(alignment: .bottom) {
+            if appState.showCommentModal {
+                CommentModalView(viewModel: commentViewModel)
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .animation(.easeInOut(duration: 0.3), value: appState.showCommentModal)
     }
 
     func tabBarItem(icon: String, label: String, index: Int) -> some View {
@@ -79,5 +106,6 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView()
+    MainTabView()
+        .environmentObject(AppState())
 }

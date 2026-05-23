@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct Tiktok_CloneApp: App {
+    @StateObject var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
-            MainView()
+            MainTabView()
+                .environmentObject(appState)
         }
     }
 }
